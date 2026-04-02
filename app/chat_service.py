@@ -1,10 +1,18 @@
-from app.llm_client import LLMClient
+from app.protocols import LLMClientProtocol
+
 
 
 class ChatService:
-    """Business-level service for chat interactions."""
+    """
+    Business-level service for chat interactions.
+    1. prompt assamble
+    2. save chat history
+    3. token count
+    4. budget management
+    5. safe check(validation)
+    """
 
-    def __init__(self, llm_client: LLMClient) -> None:
+    def __init__(self, llm_client: LLMClientProtocol) -> None:
         self._llm_client = llm_client
 
     def ask(self, question: str) -> str:

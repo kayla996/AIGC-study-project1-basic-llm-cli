@@ -6,8 +6,12 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-
+'''
+1. load the setting from .env by dotenv, saving in an inner class
+2. check if api key exist
+'''
 @dataclass(frozen=True)
+# set config obj as unchangable
 class Settings:
     """Application settings loaded from environment variables."""
     openai_api_key: str
