@@ -1,16 +1,14 @@
 from app.chat_service import ChatService
 from app.config import get_settings
 from app.llm_client import LLMClient
-from app.fake_llm_client import FakeClient
 
 
 def main() -> None:
     """CLI entry point."""
     try:
         settings = get_settings()
-        # llm_client = LLMClient(settings)
-        fake_Client = FakeClient()
-        chat_service = ChatService(fake_Client)
+        llm_client = LLMClient(settings)
+        chat_service = ChatService(llm_client)
 
         print("Simple LLM CLI is running.")
         print("Type your question and press Enter.")

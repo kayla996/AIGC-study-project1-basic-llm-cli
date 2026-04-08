@@ -1,11 +1,12 @@
 from app.protocols import LLMClientProtocol
+from app.logger import get_logger
 
-
+logger = get_logger(__name__)
 
 class ChatService:
     """
     Business-level service for chat interactions.
-    1. prompt assamble
+    1. prompt assembly
     2. save chat history
     3. token count
     4. budget management
@@ -27,6 +28,10 @@ class ChatService:
         """
         cleaned_question = question.strip()
         if not cleaned_question:
+            logger.error(f"question validation failed: Question cannot be empty.")
             raise ValueError("Question cannot be empty.")
 
-        return self._llm_client.get_chat_completion(cleaned_question)
+        logger.info(f"User question: {question}")
+        answer = self._llm_client.get_chat_completion(cleaned_question)
+        logger.info(f"Model answer: {answer}")
+        return answer

@@ -1,8 +1,11 @@
 from openai import OpenAI
-
 from app.config import Settings
+from app.logger import get_logger
 
 '''call openai model'''
+
+logger = get_logger(__name__)
+
 class LLMClient:
     """Thin wrapper around the OpenAI client."""
 
@@ -20,6 +23,7 @@ class LLMClient:
         Returns:
             The assistant's response as a string.
         """
+        logger.info(f'question to model: {question}')
         response = self._client.responses.create(
             model=self._model,
             input=[
@@ -33,5 +37,6 @@ class LLMClient:
                 },
             ],
         )
+        logger.info(f"response from model: {response}")
 
         return response.output_text.strip()
