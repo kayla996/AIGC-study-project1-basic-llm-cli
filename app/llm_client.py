@@ -12,6 +12,7 @@ class LLMClient:
     def __init__(self, settings: Settings) -> None:
         self._client = OpenAI(api_key=settings.openai_api_key)
         self._model = settings.openai_model
+        self.prompt = settings.system_prompt
 
     def get_chat_completion(self, question: str) -> str:
         """
@@ -29,7 +30,7 @@ class LLMClient:
             input=[
                 {
                     "role": "system",
-                    "content": "You are a helpful AI assistant.",
+                    "content": self.prompt,
                 },
                 {
                     "role": "user",
@@ -37,6 +38,6 @@ class LLMClient:
                 },
             ],
         )
-        logger.info(f"response from model: {response}")
+        logger.info(f"------end connect to the model-------")
 
         return response.output_text.strip()
