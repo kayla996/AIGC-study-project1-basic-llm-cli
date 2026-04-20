@@ -1,10 +1,12 @@
 from app.chat_service import ChatService
 from app.config import get_settings
 from app.llm_client import LLMClient
+from app.logger import get_logger
 
 
 def main() -> None:
     """CLI entry point."""
+    logger = get_logger(__name__)
     try:
         settings = get_settings()
         llm_client = LLMClient(settings)
@@ -18,6 +20,7 @@ def main() -> None:
             user_input = input("You: ").strip()
 
             if user_input.lower() in {"exit", "quit"}:
+                logger.info(f"user exited the application")
                 print("Goodbye!")
                 break
 
@@ -25,11 +28,14 @@ def main() -> None:
                 answer = chat_service.ask(user_input)
                 print(f"AI: {answer}\n")
             except ValueError as exc:
+                logger.warning(f"Input error: {exc}")
                 print(f"Input error: {exc}\n")
             except Exception as exc:
+                logger.exception(f"Unexpected error: {exc}")
                 print(f"Unexpected error: {exc}\n")
 
     except Exception as exc:
+        logger.exception(f"Failed to start application: {exc}")
         print(f"Failed to start application: {exc}")
 
 

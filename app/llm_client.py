@@ -29,10 +29,11 @@ class LLMClient:
         logger.info(f'question to model: {messages}')
         completion = self._client.chat.completions.create(
             model=self._model,
-            messages=[
-                {"role": "developer", "content": self.prompt},
-                *messages,
-            ],
+            # messages=[
+            #     {"role": "developer", "content": self.prompt},
+            #     *messages,
+            # ],
+            messages=messages,
         )
         logger.info(f"------end connect to the model-------")
         return completion.choices[0].message.content or ""

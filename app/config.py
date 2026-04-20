@@ -22,6 +22,8 @@ class Settings:
     openai_api_key: str
     openai_model: str
     system_prompt: str
+    app_host: str
+    app_port: int
 
 '''
 get_settings is not a class-level method
@@ -43,6 +45,8 @@ def get_settings() -> Settings:
     api_key = os.getenv("OPENAI_API_KEY", "").strip()
     model = os.getenv("OPENAI_MODEL", "gpt-4.1-mini").strip()
     system_prompt = os.getenv("SYSTEM_PROMPT", DEFAULT_SYSTEM_PROMPT)
+    app_host = os.getenv("APP_HOST", "127.0.0.1").strip()
+    app_port = int(os.getenv("APP_PART", 8000))
 
     if not api_key:
         raise ValueError(
@@ -52,5 +56,7 @@ def get_settings() -> Settings:
     return Settings(
         openai_api_key=api_key,
         openai_model=model,
-        system_prompt=system_prompt
+        system_prompt=system_prompt,
+        app_host=app_host,
+        app_port=app_port,
     )

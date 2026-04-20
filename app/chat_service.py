@@ -13,11 +13,15 @@ class ChatService:
     4. budget management
     5. safe check(validation)
     6. muti-round chat history append
+    7. call model
     """
 
-    def __init__(self, llm_client: LLMClientProtocol) -> None:
+    def __init__(self, llm_client: LLMClientProtocol, prompt: str, max_history_count: int = 6) -> None:
         self._llm_client = llm_client
         self.history : list[ChatCompletionAssistantMessageParam] = []
+        self.prompt = prompt
+        self.max_history_count = max_history_count
+
 
     def ask(self, question: str) -> str:
         """
@@ -30,6 +34,16 @@ class ChatService:
             The model's answer.
         """
         cleaned_question = question.strip()
+
+        '''
+        schema does the basic validation: like the question string cannot be void
+        but it cannot detect if the user enter a space
+        and we can add other rules here, like:
+            string is overlong
+            chat status illegal
+            prompt config is wrong
+            return value is void
+        '''
         if not cleaned_question:
             logger.error(f"question validation failed: Question cannot be empty.")
             raise ValueError("Question cannot be empty.")
@@ -41,13 +55,31 @@ class ChatService:
             "content": cleaned_question,
         }
         self.history.append(user_message)
-        # Saving token, only send 6 rounds of chat history
-        recent_history = self.history[-6:]
-        answer = self._llm_client.get_chat_completion(recent_history)
-        logger.info(f"Model answer: {answer}")
+        # For saving token, only send 6 rounds of chat history
+        self.trim_history()
+        build_out_history = self._build_history()
+        answer = self._llm_client.get_chat_completion(build_out_history)
+        logger.info(f"Answer generated successfully: {answer}")
         assistant_message: ChatCompletionAssistantMessageParam = {
             "role": "assistant", "content": answer
         }
         self.history.append(assistant_message)
+        self.trim_history()
         logger.info(f"current history: {self.history}")
+        
         return answer
+    
+    def trim_history(self) -> None:
+        if len(self.history) > self.max_history_count:
+            self.history = self.history[-self.max_history_count: ]
+
+    def _build_history(self) -> list[ChatCompletionAssistantMessageParam]:
+        system_message: ChatCompletionAssistantMessageParam = {
+            "role": "system",
+            "content": self.prompt
+        }
+        return [system_message, *self.history]
+    
+    def clear_history(self) -> None:
+        self.history.clear()
+        logger.info("Conversation history cleared.")
