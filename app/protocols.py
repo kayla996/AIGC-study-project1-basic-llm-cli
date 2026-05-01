@@ -1,5 +1,7 @@
 from typing import Protocol
-from openai.types.chat.chat_completion_assistant_message_param import ChatCompletionAssistantMessageParam
+from openai.types.chat.chat_completion_message_param import ChatCompletionMessageParam
+
+from app.rag.schemas import RetrievalResult
 
 
 '''
@@ -9,5 +11,9 @@ Just use the same form of params and return value
 … means it's an abstract class, can ignore the specific implement
 '''
 class LLMClientProtocol(Protocol):
-    def get_chat_completion(self, messages: list[ChatCompletionAssistantMessageParam]) -> str:
+    def get_chat_completion(self, messages: list[ChatCompletionMessageParam]) -> str:
+        ...
+
+class RAGCoreProtocol(Protocol):
+    def retrieve(self, question: str, top_k: int | None = None) -> RetrievalResult:
         ...

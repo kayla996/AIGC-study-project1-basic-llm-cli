@@ -1,7 +1,7 @@
 from openai import OpenAI
 from app.config import Settings
 from app.logger import get_logger
-from openai.types.chat.chat_completion_assistant_message_param import ChatCompletionAssistantMessageParam
+from openai.types.chat.chat_completion_message_param import ChatCompletionMessageParam
 
 
 '''call openai model'''
@@ -16,7 +16,7 @@ class LLMClient:
         self._model = settings.openai_model
         self.prompt = settings.system_prompt
 
-    def get_chat_completion(self, messages: list[ChatCompletionAssistantMessageParam]) -> str:
+    def get_chat_completion(self, messages: list[ChatCompletionMessageParam]) -> str:
         """
         Send a user message to the model and return the text response.
 

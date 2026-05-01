@@ -5,3 +5,17 @@ class ChatRequest(BaseModel):
 
 class ChatResponse(BaseModel):
     answer: str
+
+class SourceChunkItem(BaseModel):
+    source_id: str
+    chunk_id: str
+    score: float
+    text: str
+
+class RAGChatRequest(BaseModel):
+    question: str = Field(..., min_length=1, description="User question")
+    top_k: int | None = None
+
+class RAGChatResponse(BaseModel):
+    answer: str
+    source: list[SourceChunkItem]

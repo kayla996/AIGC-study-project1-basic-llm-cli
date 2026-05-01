@@ -1,6 +1,7 @@
 from app.protocols import LLMClientProtocol
 from app.logger import get_logger
-from openai.types.chat.chat_completion_assistant_message_param import ChatCompletionAssistantMessageParam
+from openai.types.chat.chat_completion_message_param import ChatCompletionMessageParam
+from app.protocols import RAGCoreProtocol
 
 logger = get_logger(__name__)
 
@@ -16,11 +17,12 @@ class ChatService:
     7. call model
     """
 
-    def __init__(self, llm_client: LLMClientProtocol, prompt: str, max_history_count: int = 6) -> None:
+    def __init__(self, llm_client: LLMClientProtocol, prompt: str, max_history_count: int = 6, rag_core: RAGCoreProtocol | None = None) -> None:
         self._llm_client = llm_client
-        self.history : list[ChatCompletionAssistantMessageParam] = []
+        self.history : list[ChatCompletionMessageParam] = []
         self.prompt = prompt
         self.max_history_count = max_history_count
+        self.rag_core = rag_core
 
 
     def ask(self, question: str) -> str:
@@ -50,31 +52,38 @@ class ChatService:
 
         logger.info(f"User question: {cleaned_question}")
 
-        user_message: ChatCompletionAssistantMessageParam = {
+        user_message: ChatCompletionMessageParam = {
             "role": "user",
             "content": cleaned_question,
         }
         self.history.append(user_message)
         # For saving token, only send 6 rounds of chat history
-        self.trim_history()
+        self._trim_history()
         build_out_history = self._build_history()
         answer = self._llm_client.get_chat_completion(build_out_history)
         logger.info(f"Answer generated successfully: {answer}")
-        assistant_message: ChatCompletionAssistantMessageParam = {
+        assistant_message: ChatCompletionMessageParam = {
             "role": "assistant", "content": answer
         }
         self.history.append(assistant_message)
-        self.trim_history()
+        self._trim_history()
         logger.info(f"current history: {self.history}")
         
         return answer
     
-    def trim_history(self) -> None:
+    def ask_with_rag(self, question: str, top_k: int | None = None, rag_core: RAGCoreProtocol | None = None):
+        cleaned_question = question.strip()
+
+        if not cleaned_question:
+            logger.error(f"question validation failed: Question cannot be empty.")
+            raise ValueError("Question cannot be empty.")
+
+    def _trim_history(self) -> None:
         if len(self.history) > self.max_history_count:
             self.history = self.history[-self.max_history_count: ]
 
-    def _build_history(self) -> list[ChatCompletionAssistantMessageParam]:
-        system_message: ChatCompletionAssistantMessageParam = {
+    def _build_history(self) -> list[ChatCompletionMessageParam]:
+        system_message: ChatCompletionMessageParam = {
             "role": "system",
             "content": self.prompt
         }

@@ -3,14 +3,14 @@ from app.config import get_settings
 from app.llm_client import LLMClient
 from app.logger import get_logger
 
-
+print("debug_rag.py loaded")
 def main() -> None:
     """CLI entry point."""
     logger = get_logger(__name__)
     try:
         settings = get_settings()
         llm_client = LLMClient(settings)
-        chat_service = ChatService(llm_client)
+        chat_service = ChatService(llm_client, settings.system_prompt)
 
         print("Simple LLM CLI is running.")
         print("Type your question and press Enter.")
