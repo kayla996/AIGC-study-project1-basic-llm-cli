@@ -15,5 +15,8 @@ class LLMClientProtocol(Protocol):
         ...
 
 class RAGCoreProtocol(Protocol):
-    def retrieve(self, question: str, top_k: int | None = None) -> RetrievalResult:
+    def retrieve_return_chunks(self, question: str, top_k: int | None = None) -> RetrievalResult:
+        ...
+
+    def build_or_load_default_index(self) -> None:
         ...

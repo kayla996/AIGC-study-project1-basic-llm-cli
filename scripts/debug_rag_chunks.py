@@ -24,7 +24,7 @@ def main() -> None:
             break
 
         try:
-            result = rag_core.retrieve(question)
+            result = rag_core.retrieve_return_chunks(question)
 
             print(f"\nQuestion: {result.question}")
             print(f"Retrieved {len(result.chunks)} chunk(s):\n")

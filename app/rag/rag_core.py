@@ -63,7 +63,7 @@ class RAGCore:
 
         return len(chunks)
     
-    def retrieve(self, question: str, top_k: int | None = None) -> RetrievalResult:
+    def retrieve_return_chunks(self, question: str, top_k: int | None = None) -> RetrievalResult:
         effective_top_k = top_k or self._settings.retrieval_top_k
         return self._retriever.retrieve(question, effective_top_k)
     

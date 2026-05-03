@@ -3,7 +3,7 @@ from dataclasses import dataclass
 
 from dotenv import load_dotenv
 
-from app.prompts import DEFAULT_SYSTEM_PROMPT
+from app.prompts import DEFAULT_SYSTEM_PROMPT, RAG_SYSTEM_PROMPT
 
 
 load_dotenv()
@@ -16,6 +16,7 @@ DEFAULT_EMBEDDING_MODEL = "text-embedding-3-small"
 DEFAULT_CHUNK_SIZE = 500
 DEFAULT_CHUNK_OVERLAP = 100
 DEFAULT_RETRIEVAL_TOP_K = 3
+
 
 # Path defaults
 DEFAULT_RAG_DATA_DIR = "data/raw"
@@ -48,6 +49,8 @@ class Settings:
     chunk_size: int
     chunk_overlap: int
     retrieval_top_k: int
+    rag_system_prompt: str
+    rag_retrieval_min_score: float = 0.45
 
 
 '''
@@ -58,7 +61,7 @@ it's a design mode called factory mode
 if it's constructor, 
     1.when we try to test, we can only rely on the real params from os. Otherwise, we can write down the fake params in constructor
     2.when we try to test, we cannot get the params from other way: JSON FILE, console, database, FastAPI etc. 
-    3.a constructor should be responsed to multiple purposes, like reading os params, validation, save data etc.
+    3.a constructor should be responded to multiple purposes, like reading os params, validation, save data etc.
 '''
 def get_settings() -> Settings:
     """
@@ -81,6 +84,9 @@ def get_settings() -> Settings:
     chunk_overlap = int(os.getenv("CHUNK_OVERLAP", DEFAULT_CHUNK_OVERLAP))
     retrieval_top_k = int(os.getenv("RETRIEVAL_TOP_K", DEFAULT_RETRIEVAL_TOP_K))
 
+    rag_system_prompt = os.getenv("RAG_SYSTEM_PROMPT", RAG_SYSTEM_PROMPT).strip()
+    rag_retrieval_min_score = float(os.getenv("RETRIEVAL_MIN_SCORE", str(Settings.rag_retrieval_min_score)))
+
     if not api_key:
         raise ValueError(
             "OPENAI_API_KEY is missing. Please set it in your .env file."
@@ -98,4 +104,6 @@ def get_settings() -> Settings:
         chunk_size=chunk_size,
         chunk_overlap=chunk_overlap,
         retrieval_top_k=retrieval_top_k,
+        rag_system_prompt=rag_system_prompt,
+        rag_retrieval_min_score=rag_retrieval_min_score
     )
