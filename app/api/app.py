@@ -4,6 +4,7 @@ from app.api.chat_router import router as chat_router
 from app.chat_service import ChatService
 from app.config import get_settings
 from app.llm_client import LLMClient
+from app.rag.rag_core import RAGCore
 
 '''
 Create the whole app:
@@ -13,9 +14,12 @@ Create the whole app:
 def create_app() -> FastAPI:
     settings = get_settings()
     llm_client = LLMClient(settings)
+    rag_core = RAGCore(settings)
+    rag_core.build_or_load_default_index()
     chat_service = ChatService(
         llm_client=llm_client, 
-        prompt=settings.system_prompt
+        prompt=settings.system_prompt,
+        rag_core=rag_core
     )
 
     app = FastAPI(

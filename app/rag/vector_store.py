@@ -6,12 +6,16 @@ import pickle
 import numpy as np
 
 from app.rag.schemas import DocumentChunk, RetrievedChunk
+from app.config import get_settings
+from app.logger import get_logger
 
+logger = get_logger(__name__)
 class VectorStore:
 
     def __init__(self) -> None:
         self._chunks: list[DocumentChunk] = []
         self._embeddings: np.ndarray | None = None
+        self._settings = get_settings()
 
     '''
     Vectorize and permanent store chunks and embeddings (1 : 1), which are the indexes for further searching
@@ -46,9 +50,11 @@ class VectorStore:
     ) -> list[RetrievedChunk]:
         # Avoid searching chunks before setting up the indexes
         if self.is_empty():
+            logger.warning("Vector store is empty. Need to call rag_core.build_or_load_default_index first")
             raise ValueError("Vector store is empty. Please build or load an index first")
 
         if top_k <= 0:
+            logger.warning(f"top_k({top_k}) must be greater than 0.")
             raise ValueError(f"top_k({top_k}) must be greater than 0.")
 
         query_vector = np.array(query_embedding, dtype=np.float32)
@@ -64,6 +70,10 @@ class VectorStore:
         for index in top_indexes:
             chunk = self._chunks[int(index)]
             score = float(scores[int(index)])
+
+            # fillet the irrelevant chunks
+            if score < self._settings.rag_retrieval_min_score:
+                continue
 
             results.append(
                 RetrievedChunk(

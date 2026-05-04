@@ -1,7 +1,6 @@
-from app.protocols import LLMClientProtocol
+from app.protocols import LLMClientProtocol, RAGCoreProtocol
 from app.logger import get_logger
 from openai.types.chat.chat_completion_message_param import ChatCompletionMessageParam
-from app.protocols import RAGCoreProtocol
 from app.config import get_settings
 from app.rag.schemas import RetrievedChunk
 from app.prompts import RAG_USER_PROMPT_TEMPLATE

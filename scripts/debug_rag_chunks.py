@@ -1,7 +1,9 @@
 from app.config import get_settings
 from app.rag.rag_core import RAGCore
 
-
+'''
+Test build/load index, retrieve chunk result based on the question
+'''
 def main() -> None:
     settings = get_settings()
     rag_core = RAGCore(settings)
