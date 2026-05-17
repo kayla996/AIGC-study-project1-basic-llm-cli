@@ -2,6 +2,7 @@ from openai import OpenAI
 from app.config import Settings
 from app.logger import get_logger
 from openai.types.chat.chat_completion_message_param import ChatCompletionMessageParam
+from openai.types.chat.chat_completion_tool_union_param import ChatCompletionToolUnionParam
 
 
 '''call openai model'''
@@ -37,3 +38,15 @@ class LLMClient:
         )
         logger.info(f"------end connect to the model-------")
         return completion.choices[0].message.content or ""
+    
+    def get_chat_completion_with_tools(
+            self, 
+            messages: list[ChatCompletionMessageParam], 
+            tools: list[ChatCompletionToolUnionParam]
+    ):
+        return self._client.chat.completions.create(
+            model=self._model,
+            messages=messages,
+            tools=tools,
+            tool_choice="auto"
+        )

@@ -10,7 +10,7 @@ class SourceDocument:
 
 @dataclass
 class DocumentChunk:
-    """
+    """  
     Represent A file chunk split from the original file
 
     Attributes:

@@ -1,8 +1,9 @@
 import requests
 import streamlit as st
+from app.config import get_settings
 
-
-API_URL = "http://127.0.0.1:8000/rag/chat"
+_settings = get_settings()
+API_URL = f"{_settings.app_host}:{_settings.app_port}/rag/chat"
 
 st.set_page_config(page_title="Enterprise RAG Assistant", layout="wide")
 

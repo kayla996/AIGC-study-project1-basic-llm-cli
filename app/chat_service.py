@@ -1,9 +1,12 @@
+from openai.types.chat.chat_completion_tool_union_param import ChatCompletionToolUnionParam
+from openai.types.chat.chat_completion_message_param import ChatCompletionMessageParam
+
 from app.protocols import LLMClientProtocol, RAGCoreProtocol
 from app.logger import get_logger
-from openai.types.chat.chat_completion_message_param import ChatCompletionMessageParam
 from app.config import get_settings
 from app.rag.schemas import RetrievedChunk
 from app.prompts import RAG_USER_PROMPT_TEMPLATE
+from app.tools.registry import get_tool_definitions
 
 logger = get_logger(__name__)
 
@@ -111,7 +114,31 @@ class ChatService:
 
         return answer, retrieval_result.chunks
 
+    def ask_with_tools(self, question: str, top_k: int | None = None):
+        cleaned_question = question.strip()
 
+        if not cleaned_question:
+            logger.error(f"question validation failed: Question cannot be empty.")
+            raise ValueError("Question cannot be empty.")
+        
+        logger.info(f"User question: {cleaned_question}")
+        
+        if self._rag_core is None:
+            logger.error("Runtime Error: RAG core is not initialized.")
+            raise RuntimeError("RAG core is not initialized.")
+        
+        user_message: ChatCompletionMessageParam = {
+            "role": "user",
+            "content": cleaned_question,
+        }
+        self.history.append(user_message)
+        self._trim_history()
+        first_messages = self._build_using_tools_history()
+        tools = get_tool_definitions()
+
+        first_response = self._llm_client.ge(
+            messages=first_messages,
+            tools=tools)
     def _trim_history(self) -> None:
         if len(self.history) > self.max_history_count:
             self.history = self.history[-self.max_history_count: ]
@@ -120,6 +147,13 @@ class ChatService:
         system_message: ChatCompletionMessageParam = {
             "role": "system",
             "content": self.prompt
+        }
+        return [system_message, *self.history]
+    
+    def _build_using_tools_history(self) -> list[ChatCompletionMessageParam]:
+        system_message: ChatCompletionMessageParam = {
+            "role": "system",
+            "content": f"{self.prompt}, You are a tool-using AI assistant. Use tools when needed."
         }
         return [system_message, *self.history]
     
@@ -132,7 +166,8 @@ class ChatService:
 
         for index, chunk in enumerate(retrieval_chunks, start=1):
             context_parts.append(
-                f"""[Source {index}]
+                f"""
+[Source {index}]
 source_id: {chunk.source_id}
 chunk_id: {chunk.chunk_id}
 score: {chunk.score:.4f}

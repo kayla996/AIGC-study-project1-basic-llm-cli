@@ -5,3 +5,4 @@ __pycache__/
 logs/
 *.pkl
 *.txt
+*.py%
