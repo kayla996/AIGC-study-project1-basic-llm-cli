@@ -3,13 +3,13 @@ from typing import Any
 
 from pydantic import ValidationError
 
-from app.rag.rag_core import RAGCore
+from app.protocols import RAGCoreProtocol
 from app.tools.calculator import calculate_expression
 from app.tools.rag_tools import search_knowledge_base
 from app.tools.schemas import CalculatorArgs, KnowledgeBaseSearchArgs,ToolExecutionResult
 
 class ToolExecutor:
-    def __init__(self, rag_core: RAGCore) -> None:
+    def __init__(self, rag_core: RAGCoreProtocol) -> None:
         self._rag_core = rag_core
 
     def execute(self, tool_name: str, arguments: str | dict[str, Any]) -> ToolExecutionResult:

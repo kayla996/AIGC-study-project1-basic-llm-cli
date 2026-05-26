@@ -1,5 +1,8 @@
-def get_tool_definitions() -> list[dict]:
-    return [
+from typing import Any, cast
+from openai.types.chat.chat_completion_tool_union_param import ChatCompletionToolUnionParam
+
+def get_tool_definitions() -> list[ChatCompletionToolUnionParam]:
+    tools: list[dict[str, Any]] = [
         {
             "type": "function",
             "function": {
@@ -41,3 +44,5 @@ def get_tool_definitions() -> list[dict]:
             },
         },
     ]
+
+    return cast(list[ChatCompletionToolUnionParam], tools)

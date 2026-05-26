@@ -1,5 +1,7 @@
-from typing import Protocol
+from typing import Protocol, Literal
 from openai.types.chat.chat_completion_message_param import ChatCompletionMessageParam
+from openai.types.chat.chat_completion_tool_union_param import ChatCompletionToolUnionParam
+from openai.types.chat.chat_completion_message import ChatCompletionMessage
 
 from app.rag.schemas import RetrievalResult
 
@@ -17,8 +19,10 @@ class LLMClientProtocol(Protocol):
     def get_chat_completion_with_tools(
             self, 
             messages: list[ChatCompletionMessageParam], 
-            tools: list[ChatCompletionToolUnionParam]
-    ):
+            tools: list[ChatCompletionToolUnionParam],
+            tool_choice: Literal["auto", "none"],
+    ) -> ChatCompletionMessage:
+        ...
 
 class RAGCoreProtocol(Protocol):
     def retrieve_return_chunks(self, question: str, top_k: int | None = None) -> RetrievalResult:

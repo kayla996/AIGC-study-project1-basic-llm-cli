@@ -1,7 +1,7 @@
-from app.rag.rag_core import RAGCore
+from app.protocols import RAGCoreProtocol
 from app.tools.schemas import SourceChunkItem, KnowledgeBaseSearchResult, KnowledgeBaseSearchArgs 
 
-def  search_knowledge_base(rag_core: RAGCore, question: str, top_k: int = 3) ->KnowledgeBaseSearchResult:
+def  search_knowledge_base(rag_core: RAGCoreProtocol, question: str, top_k: int = 3) ->KnowledgeBaseSearchResult:
     args = KnowledgeBaseSearchArgs(question=question, top_k=top_k)
 
     # question = question.strip()
