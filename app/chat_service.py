@@ -228,8 +228,18 @@ class ChatService:
                     "content": tool_payload.model_dump_json()
                 }
             )
+            """
+            # Must follow the following order, messages with role 'tool' must be a response to a proceeding message with 'tool_calls' which is "assistant":
+            [
+                {"role": "system", ...},
+                {"role": "user", ...},
+                {"role": "assistant", ...},
+                {"role": "tool", ...}
+            ]           
+            """
             self._trim_history()
             final_message = self._build_using_tools_history()
+            
 
             logger.info(f"Final tool calls message: {final_message}")
 

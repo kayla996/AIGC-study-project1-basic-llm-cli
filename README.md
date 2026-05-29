@@ -26,6 +26,11 @@ RAG是利用已有的资料文件进行查询并且返回和提问相关的片�
 # How to Run API
 # How to Run UI
 # API Example
+```bash
+curl -X POST http://127.0.0.1:8000/tools/chat \
+  -H "Content-Type: application/json" \
+  -d '{"question": "根据知识库，第四周完成了什么？", "top_k": 3}'
+  ```
 # Demo Screenshots
 # Current Limitations
 # Current Goals
